@@ -27,7 +27,7 @@ type Combo struct {
 type Config struct {
 	Pkgpath      string
 	Binname      string
-	Binpath      string
+	Outpath      string
 	Delimeter    string
 	DefaultCombo Combo
 	GlobalEnv    []string
@@ -41,7 +41,7 @@ func NewConfig(pkgpath string) *Config {
 	return &Config{
 		Pkgpath:      pkgpath,
 		Binname:      binname,
-		Binpath:      "./bin",
+		Outpath:      "./bin",
 		Delimeter:    "/",
 		DefaultCombo: Combo{runtime.GOOS, runtime.GOARCH},
 		GlobalEnv:    []string{"CGO_ENABLED=0"},
@@ -175,7 +175,7 @@ func Run(args []string) {
 	bingo.Parse(args)
 
 	config := NewConfig(pkg)
-	config.Binpath = bin
+	config.Outpath = bin
 
 	combos := []Combo{}
 	freeArgs := []string{}
@@ -205,7 +205,7 @@ func Run(args []string) {
 		}
 
 		buildArgs := []string{"build",
-			"-o", filepath.Join(config.Binpath, c.ReleaseName(config)),
+			"-o", filepath.Join(config.Outpath, c.ReleaseName(config)),
 			"-mod=readonly",
 			"-trimpath",
 			"-ldflags", ldflags,
@@ -227,11 +227,11 @@ func Run(args []string) {
 			build = exec.Command(gocmd, buildArgs...)
 			strip = exec.Command(
 				"strip",
-				filepath.Join(config.Binpath, c.ReleaseName(config)),
+				filepath.Join(config.Outpath, c.ReleaseName(config)),
 			)
 			upx = exec.Command(
 				"upx",
-				filepath.Join(config.Binpath, c.ReleaseName(config)),
+				filepath.Join(config.Outpath, c.ReleaseName(config)),
 			)
 		)
 
@@ -271,7 +271,7 @@ func Run(args []string) {
 		if c == config.DefaultCombo {
 			for _, bin := range []string{"k0s"} {
 				src := filepath.Join(c.ReleaseName(config))
-				dst := filepath.Join(config.Binpath, bin)
+				dst := filepath.Join(config.Outpath, bin)
 				ln(src, dst)
 			}
 		}
