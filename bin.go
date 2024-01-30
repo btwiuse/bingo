@@ -269,7 +269,7 @@ func Run(args []string) {
 		}
 
 		if c == config.DefaultCombo {
-			for _, bin := range []string{"k0s"} {
+			for _, bin := range []string{config.Binname} {
 				src := filepath.Join(c.ReleaseName(config))
 				dst := filepath.Join(config.Outpath, bin)
 				ln(src, dst)
