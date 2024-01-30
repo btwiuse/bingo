@@ -26,35 +26,30 @@ type Combo struct {
 
 type Config struct {
 	Pkgpath      string
-	BinPath      string
+	Binname      string
+	Binpath      string
 	Delimeter    string
 	DefaultCombo Combo
 	GlobalEnv    []string
 }
 
 func NewConfig(pkgpath string) *Config {
+	// get last part of the package path
+	// e.g. "k0s.io/pkg/agent" -> "agent"
+	parts := strings.Split(config.Pkgpath, "/")
+	binname := parts[len(parts)-1]
 	return &Config{
 		Pkgpath:      pkgpath,
-		BinPath:      "./bin",
+		Binname:      binname,
+		Binpath:      "./bin",
 		Delimeter:    "/",
 		DefaultCombo: Combo{runtime.GOOS, runtime.GOARCH},
 		GlobalEnv:    []string{"CGO_ENABLED=0"},
 	}
 }
 
-var DefaultConfig = &Config{
-	Pkgpath:      "./cmd/k0s",
-	BinPath:      "bin",
-	Delimeter:    "/",
-	DefaultCombo: Combo{runtime.GOOS, runtime.GOARCH},
-	GlobalEnv:    []string{"CGO_ENABLED=0"},
-}
-
 func (c Combo) ReleaseName(config *Config) string {
-	// get last part of the package path
-	// e.g. "k0s.io/pkg/agent" -> "agent"
-	parts := strings.Split(config.Pkgpath, "/")
-	exe := parts[len(parts)-1]
+	exe := config.Binname
 	if c.OS == "windows" {
 		exe = fmt.Sprintf("%s.exe", exe)
 	}
@@ -180,7 +175,7 @@ func Run(args []string) {
 	bingo.Parse(args)
 
 	config := NewConfig(pkg)
-	config.BinPath = bin
+	config.Binpath = bin
 
 	combos := []Combo{}
 	freeArgs := []string{}
@@ -210,7 +205,7 @@ func Run(args []string) {
 		}
 
 		buildArgs := []string{"build",
-			"-o", filepath.Join(config.BinPath, c.ReleaseName(config)),
+			"-o", filepath.Join(config.Binpath, c.ReleaseName(config)),
 			"-mod=readonly",
 			"-trimpath",
 			"-ldflags", ldflags,
@@ -232,11 +227,11 @@ func Run(args []string) {
 			build = exec.Command(gocmd, buildArgs...)
 			strip = exec.Command(
 				"strip",
-				filepath.Join(config.BinPath, c.ReleaseName(config)),
+				filepath.Join(config.Binpath, c.ReleaseName(config)),
 			)
 			upx = exec.Command(
 				"upx",
-				filepath.Join(config.BinPath, c.ReleaseName(config)),
+				filepath.Join(config.Binpath, c.ReleaseName(config)),
 			)
 		)
 
@@ -276,7 +271,7 @@ func Run(args []string) {
 		if c == config.DefaultCombo {
 			for _, bin := range []string{"k0s"} {
 				src := filepath.Join(c.ReleaseName(config))
-				dst := filepath.Join(config.BinPath, bin)
+				dst := filepath.Join(config.Binpath, bin)
 				ln(src, dst)
 			}
 		}
