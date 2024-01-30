@@ -36,7 +36,7 @@ type Config struct {
 func NewConfig(pkgpath string) *Config {
 	// get last part of the package path
 	// e.g. "k0s.io/pkg/agent" -> "agent"
-	parts := strings.Split(config.Pkgpath, "/")
+	parts := strings.Split(pkgpath, "/")
 	binname := parts[len(parts)-1]
 	return &Config{
 		Pkgpath:      pkgpath,
