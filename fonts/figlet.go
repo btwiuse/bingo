@@ -8,7 +8,7 @@ import (
 
 	"github.com/lukesampson/figlet/figletlib"
 	isatty "github.com/mattn/go-isatty"
-	"k0s.io/pkg/console"
+	"github.com/containerd/console"
 )
 
 func Figlet(str string) {
