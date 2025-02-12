@@ -153,7 +153,7 @@ func parseCombo(osarch string) Combo {
 	}
 }
 
-func Run(args []string) {
+func Run(args []string) error {
 	var (
 		stripFlag bool
 		upxFlag   bool
@@ -276,6 +276,8 @@ func Run(args []string) {
 			}
 		}
 	}
+
+	return nil
 }
 
 func ln(from, to string) {
