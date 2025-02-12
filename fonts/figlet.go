@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/containerd/console"
 	"github.com/lukesampson/figlet/figletlib"
 	isatty "github.com/mattn/go-isatty"
-	"github.com/containerd/console"
 )
 
 func Figlet(str string) {
